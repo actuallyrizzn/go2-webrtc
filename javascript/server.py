@@ -35,6 +35,7 @@ else:
     print(f"Path {path_to_add} does not exist")
 
 import go2_webrtc
+from aiortc import RTCSessionDescription
 
 PORT = 8081
 
@@ -72,8 +73,11 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 return
 
+            # Convert the dictionary to RTCSessionDescription
+            sdp_offer = RTCSessionDescription(sdp=data.sdp, type=data.type)
+            
             response_data = go2_webrtc.Go2Connection.get_peer_answer(
-                data, data.token, data.ip
+                sdp_offer, data.token, data.ip
             )
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
